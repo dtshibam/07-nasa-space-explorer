@@ -1,4 +1,4 @@
-/* --- 1. GLOBAL RESET & NASA THEME --- */
+/* Global reset & box sizing */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -14,6 +14,7 @@
   --text-muted: #cccccc;
 }
 
+/* Base page styles - Dark Mode for Space */
 body {
   font-family: 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--space-black);
@@ -22,35 +23,36 @@ body {
   line-height: 1.6;
 }
 
+/* Centered container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* --- 2. HEADER & BRANDING --- */
+/* Header */
 .site-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px 0;
-  border-bottom: 2px solid var(--nasa-red);
+  border-bottom: 2px solid var(--nasa-red); /* NASA Red Accent */
   margin-bottom: 30px;
-}
-
-.logo {
-  width: 180px;
-  margin-bottom: 10px;
 }
 
 h1 {
   font-family: 'Verdana', sans-serif;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-align: center;
+  margin-top: 10px;
 }
 
-/* --- 3. FILTERS & INPUTS --- */
+/* Logo */
+.logo {
+  width: 180px;
+}
+
+/* Date-picker & button row */
 .filters {
   display: flex;
   flex-direction: column;
@@ -60,13 +62,12 @@ h1 {
   background: #111;
   padding: 20px;
   border-radius: 8px;
-  border: 1px solid #333;
 }
 
 input[type="date"],
 button {
   padding: 12px 15px;
-  border: 1px solid #444;
+  border: 1px solid #333;
   border-radius: 4px;
   font-size: 16px;
   outline: none;
@@ -77,36 +78,31 @@ input[type="date"] {
   color: white;
 }
 
+/* Button - NASA Blue */
 button {
   background-color: var(--nasa-blue);
   color: white;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
   border: none;
 }
 
 button:hover {
   background-color: #082d6b;
-  box-shadow: 0 0 15px rgba(11, 61, 145, 0.5);
+  box-shadow: 0 0 15px rgba(11, 61, 145, 0.4);
 }
 
-@media (min-width: 600px) {
-  .filters { flex-direction: row; }
-  input[type="date"], button { width: auto; flex: 1; }
-}
-
-/* --- 4. GALLERY GRID (Fixes the overlapping/weird layout) --- */
+/* Gallery Grid */
 .gallery {
   display: grid;
-  /* Automatically creates 3 columns on desktop, 2 on tablet, 1 on mobile */
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 25px;
   padding-bottom: 50px;
-  width: 100%;
 }
 
+/* Gallery items with LevelUp Hover Effect */
 .gallery-item {
   background: var(--card-bg);
   border-radius: 12px;
@@ -116,56 +112,37 @@ button:hover {
   cursor: pointer;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
   border: 1px solid #333;
-  height: 100%; /* Ensures all cards in a row match height */
 }
 
-/* LEVELUP: Hover Zoom Effect (5 pts) */
+/* LevelUp: Hover Zoom Effect (5 pts) */
 .gallery-item:hover {
   transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   border-color: var(--nasa-blue);
 }
 
-.gallery-item img, 
-.video-icon {
+.gallery-item img {
   width: 100%;
-  height: 220px; /* Fixed height for consistency */
+  height: 250px;
   object-fit: cover;
-  display: block;
-}
-
-/* Styling for the "View Space Video" placeholder in gallery */
-.video-icon {
-  background-color: #2a2a2a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: bold;
 }
 
 .item-info {
-  padding: 20px;
-  flex-grow: 1; /* Pushes content to fill the card space */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: 15px;
 }
 
 .item-info h3 {
   font-size: 1.1rem;
-  margin-bottom: 10px;
-  color: #fff;
-  line-height: 1.4;
-}
-
-.item-date {
+  margin-bottom: 5px;
   color: var(--nasa-red);
-  font-weight: bold;
-  font-size: 0.9rem;
 }
 
-/* --- 5. MODAL & VIDEO PLAYER FIX --- */
+.item-info p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Modal View Styling (10 pts) */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0;
@@ -174,13 +151,13 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 1000;
   padding: 20px;
 }
 
 .modal-content {
   background: #111;
-  max-width: 850px;
+  max-width: 800px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -189,59 +166,48 @@ button:hover {
   border: 1px solid var(--nasa-blue);
 }
 
-.modal-text { padding: 30px; }
+.modal-content img, .modal-content iframe {
+  width: 100%;
+  display: block;
+}
+
+.modal-text {
+  padding: 30px;
+}
 
 .close-btn {
   position: absolute;
   top: 15px; right: 20px;
   color: white;
   font-size: 35px;
-  background: none;
-  border: none;
   cursor: pointer;
-  z-index: 100;
+  z-index: 10;
 }
 
-/* The 16:9 Aspect Ratio container for videos */
-.video-container {
-  position: relative;
-  padding-bottom: 56.25%; 
-  height: 0;
-  overflow: hidden;
-  background: #000;
-}
-
-.video-container iframe {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-}
-
-.modal-content img {
-  width: 100%;
-  display: block;
-}
-
-/* --- 6. EXTRA UI ELEMENTS --- */
+/* Loading Message (5 pts) */
 .loading-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 80px;
-  font-size: 1.3rem;
+  padding: 50px;
+  font-size: 1.2rem;
   color: var(--nasa-blue);
 }
 
+/* LevelUp: Random Fact Styling (10 pts) */
 .daily-fact {
-  background: rgba(11, 61, 145, 0.2);
-  border-left: 5px solid var(--nasa-blue);
-  padding: 15px 25px;
-  margin-bottom: 30px;
+  background: rgba(252, 61, 33, 0.1);
+  border-left: 4px solid var(--nasa-red);
+  padding: 15px;
+  margin-bottom: 25px;
   border-radius: 4px;
 }
 
-.placeholder {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 100px;
-  opacity: 0.5;
+/* Responsiveness */
+@media (min-width: 600px) {
+  .filters {
+    flex-direction: row;
+  }
+  input[type="date"] {
+    flex: 1;
+  }
 }
