@@ -17,7 +17,8 @@ const searchBtn = document.querySelector('button');
 
 // 2. Fetch Data from NASA API
 async function fetchNASAData() {
-    const apiKey = 'DEMO_KEY'; // Replace with your actual NASA API key if needed
+    // YOUR API KEY INTEGRATED BELOW
+    const apiKey = 'cKBY6hSNpY3hec0iVWzpdoClgXINNOkb9S9jyYdO'; 
     const start = startInput.value;
     const end = endInput.value;
 
@@ -58,16 +59,16 @@ function renderGallery(data) {
         card.className = 'gallery-item';
 
         // [LevelUp: Handle Video Entries]
-        // If it's a video, we show a placeholder icon; images show the actual NASA photo.
+        // Thumbnail placeholder for videos, actual image for photos
         const mediaElement = item.media_type === 'video' 
-            ? `<div class="video-icon">📹 View Space Video</div>`
-            : `<img src="${item.url}" alt="${item.title}" loading="lazy">`;
+            ? `<div class="video-icon" style="height:220px; display:flex; align-items:center; justify-content:center; background:#2a2a2a; color:white; font-weight:bold;">📹 View Space Video</div>`
+            : `<img src="${item.url}" alt="${item.title}" loading="lazy" style="width:100%; height:220px; object-fit:cover;">`;
 
         card.innerHTML = `
             ${mediaElement}
-            <div class="item-info">
-                <h3>${item.title}</h3>
-                <p class="item-date">${item.date}</p>
+            <div class="item-info" style="padding:15px;">
+                <h3 style="margin:0; font-size:1.1rem;">${item.title}</h3>
+                <p class="item-date" style="color: #FC3D21; font-weight:bold; margin-top:5px;">${item.date}</p>
             </div>
         `;
 
@@ -79,23 +80,38 @@ function renderGallery(data) {
 
 // 4. Modal View Function
 function openModal(item) {
-    // Create Modal Elements
     const modalOverlay = document.createElement('div');
     modalOverlay.className = 'modal-overlay';
     
-    // Handle Video vs Image in Modal
-    const modalMedia = item.media_type === 'video'
-        ? `<iframe src="${item.url}" frameborder="0" allowfullscreen></iframe>`
-        : `<img src="${item.hdurl || item.url}" alt="${item.title}">`;
+    let modalMedia = '';
+
+    // CRITICAL FIX: Convert YouTube URLs to /embed/ format so they play in iFrames
+    if (item.media_type === 'video') {
+        let videoUrl = item.url;
+        if (videoUrl.includes('youtube.com/watch?v=')) {
+            videoUrl = videoUrl.replace('watch?v=', 'embed/');
+        } else if (videoUrl.includes('youtu.be/')) {
+            videoUrl = videoUrl.replace('youtu.be/', 'youtube.com/embed/');
+        }
+        // Force HTTPS
+        videoUrl = videoUrl.replace('http://', 'https://');
+
+        modalMedia = `
+            <div class="video-container" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+                <iframe src="${videoUrl}" style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allowfullscreen></iframe>
+            </div>`;
+    } else {
+        modalMedia = `<img src="${item.hdurl || item.url}" alt="${item.title}" style="width:100%; display:block;">`;
+    }
 
     modalOverlay.innerHTML = `
         <div class="modal-content">
             <button class="close-btn">&times;</button>
             ${modalMedia}
-            <div class="modal-text">
+            <div class="modal-text" style="padding:30px; color:white;">
                 <h2>${item.title}</h2>
-                <span class="modal-date">${item.date}</span>
-                <p class="explanation">${item.explanation}</p>
+                <span class="modal-date" style="color: #FC3D21; font-weight:bold;">${item.date}</span>
+                <p class="explanation" style="margin-top:15px; line-height:1.6;">${item.explanation}</p>
             </div>
         </div>
     `;
@@ -106,7 +122,6 @@ function openModal(item) {
     const closeBtn = modalOverlay.querySelector('.close-btn');
     closeBtn.onclick = () => modalOverlay.remove();
     
-    // Close if clicking outside the content box
     modalOverlay.onclick = (e) => {
         if (e.target === modalOverlay) modalOverlay.remove();
     };
@@ -130,8 +145,9 @@ window.addEventListener('DOMContentLoaded', () => {
     factSection.className = 'daily-fact';
     factSection.innerHTML = `<p><strong>Did You Know?</strong> ${randomFact}</p>`;
     
-    // Insert after the header
     const container = document.querySelector('.container');
     const header = document.querySelector('.site-header');
-    container.insertBefore(factSection, header.nextSibling);
+    if (container && header) {
+        container.insertBefore(factSection, header.nextSibling);
+    }
 });
