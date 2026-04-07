@@ -1,12 +1,13 @@
 /**
  * NASA Space Explorer - script.js
+ * Handles API fetching, gallery rendering, and modal views.
  */
 
-// 1. Initialize Date Inputs & Logic from dateRange.js
+// 1. Initialize Date Inputs (From your provided snippet)
 const startInput = document.getElementById('startDate');
 const endInput = document.getElementById('endDate');
 
-// This uses the setup function provided in your starter files
+// Ensure the dateRange.js logic is applied to restrict dates (1995-Today)
 if (typeof setupDateInputs === 'function') {
     setupDateInputs(startInput, endInput);
 }
@@ -16,7 +17,7 @@ const searchBtn = document.querySelector('button');
 
 // 2. Fetch Data from NASA API
 async function fetchNASAData() {
-    const apiKey = 'DEMO_KEY'; // Replace with your actual NASA API key if you have one
+    const apiKey = 'DEMO_KEY'; // Replace with your actual NASA API key if needed
     const start = startInput.value;
     const end = endInput.value;
 
@@ -43,7 +44,7 @@ async function fetchNASAData() {
 
         renderGallery(data);
     } catch (error) {
-        gallery.innerHTML = `<p class="error" style="color:red; text-align:center;">Error: ${error.message || 'Could not fetch data.'}</p>`;
+        gallery.innerHTML = `<p class="error">Error: ${error.message || 'Could not fetch data.'}</p>`;
         console.error("API Fetch Error:", error);
     }
 }
@@ -56,16 +57,14 @@ function renderGallery(data) {
         const card = document.createElement('div');
         card.className = 'gallery-item';
 
-        // Check if it's a video or image for the thumbnail
-        let mediaThumbnail = '';
-        if (item.media_type === 'video') {
-            mediaThumbnail = `<div class="video-icon" style="height:250px; display:flex; align-items:center; justify-content:center; background:#333;">📹 View Space Video</div>`;
-        } else {
-            mediaThumbnail = `<img src="${item.url}" alt="${item.title}" loading="lazy">`;
-        }
+        // [LevelUp: Handle Video Entries]
+        // If it's a video, we show a placeholder icon; images show the actual NASA photo.
+        const mediaElement = item.media_type === 'video' 
+            ? `<div class="video-icon">📹 View Space Video</div>`
+            : `<img src="${item.url}" alt="${item.title}" loading="lazy">`;
 
         card.innerHTML = `
-            ${mediaThumbnail}
+            ${mediaElement}
             <div class="item-info">
                 <h3>${item.title}</h3>
                 <p class="item-date">${item.date}</p>
@@ -78,54 +77,36 @@ function renderGallery(data) {
     });
 }
 
-// 4. Modal View Function (With Video Fix)
+// 4. Modal View Function
 function openModal(item) {
+    // Create Modal Elements
     const modalOverlay = document.createElement('div');
     modalOverlay.className = 'modal-overlay';
     
-    let mediaHtml = '';
-
-    if (item.media_type === 'video') {
-        // Fix for YouTube URLs to ensure they work in an iframe
-        let videoUrl = item.url;
-        if (videoUrl.includes('youtube.com/watch?v=')) {
-            videoUrl = videoUrl.replace('watch?v=', 'embed/');
-        } else if (videoUrl.includes('youtu.be/')) {
-            videoUrl = videoUrl.replace('youtu.be/', 'youtube.com/embed/');
-        }
-        // Force HTTPS to avoid security blocks
-        videoUrl = videoUrl.replace('http://', 'https://');
-
-        mediaHtml = `
-            <div class="video-container">
-                <iframe 
-                    src="${videoUrl}" 
-                    frameborder="0" 
-                    allow="autoplay; encrypted-media" 
-                    allowfullscreen>
-                </iframe>
-            </div>`;
-    } else {
-        // High-res image logic
-        mediaHtml = `<img src="${item.hdurl || item.url}" alt="${item.title}">`;
-    }
+    // Handle Video vs Image in Modal
+    const modalMedia = item.media_type === 'video'
+        ? `<iframe src="${item.url}" frameborder="0" allowfullscreen></iframe>`
+        : `<img src="${item.hdurl || item.url}" alt="${item.title}">`;
 
     modalOverlay.innerHTML = `
         <div class="modal-content">
             <button class="close-btn">&times;</button>
-            ${mediaHtml}
+            ${modalMedia}
             <div class="modal-text">
                 <h2>${item.title}</h2>
-                <span class="modal-date" style="color: #FC3D21; font-weight: bold;">${item.date}</span>
-                <p class="explanation" style="margin-top: 15px; line-height: 1.6;">${item.explanation}</p>
+                <span class="modal-date">${item.date}</span>
+                <p class="explanation">${item.explanation}</p>
             </div>
         </div>
     `;
 
     document.body.appendChild(modalOverlay);
 
-    // Close logic
-    modalOverlay.querySelector('.close-btn').onclick = () => modalOverlay.remove();
+    // Close Logic
+    const closeBtn = modalOverlay.querySelector('.close-btn');
+    closeBtn.onclick = () => modalOverlay.remove();
+    
+    // Close if clicking outside the content box
     modalOverlay.onclick = (e) => {
         if (e.target === modalOverlay) modalOverlay.remove();
     };
@@ -149,6 +130,7 @@ window.addEventListener('DOMContentLoaded', () => {
     factSection.className = 'daily-fact';
     factSection.innerHTML = `<p><strong>Did You Know?</strong> ${randomFact}</p>`;
     
+    // Insert after the header
     const container = document.querySelector('.container');
     const header = document.querySelector('.site-header');
     container.insertBefore(factSection, header.nextSibling);
